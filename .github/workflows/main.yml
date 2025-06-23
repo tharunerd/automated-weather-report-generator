@@ -25,8 +25,9 @@ jobs:
 
       - name: Run weather email script
         env:
-          OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
-          EMAIL: ${{ secrets.EMAIL }}
-          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
-          RECIPIENT: ${{ secrets.RECIPIENT }}
+       WEATHERAPI_KEY: ${{ secrets.WEATHERAPI_KEY }}
+       EMAIL: ${{ secrets.EMAIL }}
+       EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+       RECIPIENT: ${{ secrets.RECIPIENT }}
+
         run: python main.py
