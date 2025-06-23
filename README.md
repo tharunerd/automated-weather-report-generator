@@ -31,7 +31,7 @@ Perfect for:
 
 ### 1. Fork or Clone the Repo
 ```bash
-git clone https://github.com/your-username/daily_weather_aqi_email.git
+git clone https://github.com/tharunerd/automated-weather-report-generator.git
 ```
 
 ### 2. Add GitHub Secrets
@@ -77,7 +77,7 @@ Stay hydrated. Have a calm, productive day!
 ---
 
 ## 🌍 Credits
-Made with ❤️ by [Tharun Kumar Akula](https://github.com/your-username)
+Made with ❤️ by [Tharun Kumar Akula](https://github.com/tharunerd)
 
 Data provided by:
 - [OpenWeatherMap](https://openweathermap.org/)
