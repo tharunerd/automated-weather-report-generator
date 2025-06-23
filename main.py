@@ -6,17 +6,16 @@ from email.mime.text import MIMEText
 from dotenv import load_dotenv
 
 load_dotenv()
-
-API_KEY = os.getenv("API_KEY")
-EMAIL_USER = os.getenv("EMAIL_USER")
+WEATHERAPI_KEY = os.getenv("WEATHERAPI_KEY")
+EMAIL = os.getenv("EMAIL")
 EMAIL_PASS = os.getenv("EMAIL_PASS")
-TO_EMAIL = os.getenv("TO_EMAIL")  # recipient email
+RECIPIENT = os.getenv("RECIPIENT")
 
 LOCATION = "Gurugram Candor Tech Space"
 CITY = "Gurgaon"
 COUNTRY = "IN"
-LAT = 28.4595    # latitude for Gurugram
-LON = 77.0266    # longitude for Gurugram
+LAT = 28.4595
+LON = 77.0266
 
 def format_weather_email(data):
     date_str = data['date'].strftime("%d %B %Y")
@@ -34,9 +33,9 @@ def format_weather_email(data):
     lines.append(f"Feels Like: {weather['feels_like_c']}°C")
     lines.append(f"Humidity: {weather['humidity']}%")
     lines.append(f"Wind: {weather['wind_kmh']} km/h")
-    lines.append(f"Cloud Cover: {weather['cloud_cover']}")
-    lines.append(f"Visibility: {weather['visibility']}")
-    lines.append(f"Chance of Rain: {weather['chance_of_rain']}%")
+    lines.append(f"Cloud Cover: {weather['cloud_cover']}%")
+    lines.append(f"Visibility: {weather['visibility']} km")
+    lines.append(f"Chance of Rain: {weather['chance_of_rain']} mm")
     lines.append(f"Sunrise: {weather['sunrise']}")
     lines.append(f"Sunset: {weather['sunset']} \n")
 
@@ -44,10 +43,10 @@ def format_weather_email(data):
     lines.append(f"AQI: {aqi['aqi']} – {aqi['category']}")
     lines.append(f"PM2.5: {aqi['pm25']} µg/m³")
     lines.append(f"PM10: {aqi['pm10']} µg/m³")
-    lines.append(f"CO: {aqi['co']} ppb")
-    lines.append(f"NO₂: {aqi['no2']} ppb")
-    lines.append(f"SO₂: {aqi['so2']} ppb")
-    lines.append(f"O₃: {aqi['o3']} ppb \n")
+    lines.append(f"CO: {aqi['co']} µg/m³")
+    lines.append(f"NO₂: {aqi['no2']} µg/m³")
+    lines.append(f"SO₂: {aqi['so2']} µg/m³")
+    lines.append(f"O₃: {aqi['o3']} µg/m³ \n")
 
     lines.append("🌞 UV Index")
     lines.append(f"UV Index: {uv['value']} – {uv['category']} ({uv['note']}) \n")
@@ -58,85 +57,63 @@ def format_weather_email(data):
 
     return "\n".join(lines)
 
-def kelvin_to_celsius(k): return round(k - 273.15)
-def kelvin_to_fahrenheit(k): return round((k - 273.15) * 9/5 + 32)
-def mps_to_kmh(mps): return round(mps * 3.6)
-
 def get_weather_data():
-    WEATHERAPI_KEY = os.getenv("WEATHERAPI_KEY")  # Add your WeatherAPI key to .env
-    url = f"http://api.weatherapi.com/v1/current.json?key={WEATHERAPI_KEY}&q={CITY},{COUNTRY}&aqi=yes"
+    url = f"http://api.weatherapi.com/v1/forecast.json?key={WEATHERAPI_KEY}&q={CITY},{COUNTRY}&days=1&aqi=yes&alerts=no"
     resp = requests.get(url)
     resp.raise_for_status()
     data = resp.json()
 
     current = data['current']
-    condition = current['condition']['text']
-    temp_c = current['temp_c']
-    temp_f = current['temp_f']
-    feels_like_c = current['feelslike_c']
-    humidity = current['humidity']
-    wind_kmh = current['wind_kph']
-    cloud_cover = f"{current['cloud']}%"
-    visibility = f"{current['vis_km']} km"
-    chance_of_rain = current.get('precip_mm', "N/A")
-    # WeatherAPI's free plan does not provide sunrise/sunset in current endpoint
-    sunrise = "N/A"
-    sunset = "N/A"
+    forecast_day = data['forecast']['forecastday'][0]['astro']
 
     weather = {
-        "condition": condition,
-        "temp_c": temp_c,
-        "temp_f": temp_f,
-        "feels_like_c": feels_like_c,
-        "humidity": humidity,
-        "wind_kmh": wind_kmh,
-        "cloud_cover": cloud_cover,
-        "visibility": visibility,
-        "chance_of_rain": chance_of_rain,
-        "sunrise": sunrise,
-        "sunset": sunset
+        "condition": current['condition']['text'],
+        "temp_c": current['temp_c'],
+        "temp_f": current['temp_f'],
+        "feels_like_c": current['feelslike_c'],
+        "humidity": current['humidity'],
+        "wind_kmh": current['wind_kph'],
+        "cloud_cover": current['cloud'],
+        "visibility": current['vis_km'],
+        "chance_of_rain": current['precip_mm'],
+        "sunrise": forecast_day['sunrise'],
+        "sunset": forecast_day['sunset']
     }
     return weather
 
 def get_air_quality_data():
-    url = f"http://api.openweathermap.org/data/2.5/air_pollution?lat={LAT}&lon={LON}&appid={API_KEY}"
+    url = f"http://api.weatherapi.com/v1/current.json?key={WEATHERAPI_KEY}&q={CITY},{COUNTRY}&aqi=yes"
     resp = requests.get(url)
     resp.raise_for_status()
     data = resp.json()
 
-    components = data['list'][0]['components']
-    aqi_index = data['list'][0]['main']['aqi']
+    air_quality = data['current']['air_quality']
 
-    # Map OWM AQI index to category
-    aqi_map = {
-        1: "Good",
-        2: "Fair",
-        3: "Moderate",
-        4: "Poor",
-        5: "Very Poor",
-    }
-    aqi_category = aqi_map.get(aqi_index, "Unknown")
+    def aqi_category(pm25):
+        if pm25 <= 30:
+            return "Good"
+        elif pm25 <= 60:
+            return "Moderate"
+        elif pm25 <= 90:
+            return "Poor"
+        elif pm25 <= 120:
+            return "Very Poor"
+        else:
+            return "Hazardous"
 
     aqi = {
-        "aqi": aqi_index,
-        "category": aqi_category,
-        "pm25": components.get('pm2_5', 0),
-        "pm10": components.get('pm10', 0),
-        "co": int(components.get('co', 0)*1000),
-        "no2": int(components.get('no2', 0)*1000),
-        "so2": int(components.get('so2', 0)*1000),
-        "o3": int(components.get('o3', 0)*1000)
+        "aqi": round(air_quality['pm2_5']),
+        "category": aqi_category(air_quality['pm2_5']),
+        "pm25": round(air_quality['pm2_5'], 1),
+        "pm10": round(air_quality['pm10'], 1),
+        "co": round(air_quality['co'], 1),
+        "no2": round(air_quality['no2'], 1),
+        "so2": round(air_quality['so2'], 1),
+        "o3": round(air_quality['o3'], 1)
     }
     return aqi
 
 def get_uv_index():
-    url = f"http://api.openweathermap.org/data/2.5/uvi?lat={LAT}&lon={LON}&appid={API_KEY}"
-    # Note: This endpoint is deprecated, but for demo, let's use it.
-    # New UV index API is part of One Call API (not free).
-    # So we'll fake data here as example.
-
-    # You may want to fetch UV index from another source or your weather API.
-
     uv = {
         "value": 0,
         "category": "Low",
@@ -147,12 +124,12 @@ def get_uv_index():
 def send_email(subject, body, to_email):
     msg = MIMEText(body)
     msg['Subject'] = subject
-    msg['From'] = EMAIL_USER
+    msg['From'] = EMAIL
     msg['To'] = to_email
 
     with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
-        server.login(EMAIL_USER, EMAIL_PASS)
-        server.sendmail(EMAIL_USER, to_email, msg.as_string())
+        server.login(EMAIL, EMAIL_PASS)
+        server.sendmail(EMAIL, to_email, msg.as_string())
 
 def main():
     weather = get_weather_data()
@@ -174,7 +151,7 @@ def main():
 
     email_body = format_weather_email(data)
     subject = f"Weather & AQI Update for {LOCATION} on {data['date'].strftime('%d %B %Y')}"
-    send_email(subject, email_body, TO_EMAIL)
+    send_email(subject, email_body, RECIPIENT)
     print("Email sent successfully!")
 
 if __name__ == "__main__":
