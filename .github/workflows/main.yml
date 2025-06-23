@@ -2,7 +2,7 @@ name: Scheduled Weather Email
 
 on:
   schedule:
-    - cron: '50 11 * * *'  # 5:17 PM IST = 11:47 AM UTC
+    - cron: '30 2 * * *'  # Runs at 8:00 AM IST daily
   workflow_dispatch:
 
 jobs:
