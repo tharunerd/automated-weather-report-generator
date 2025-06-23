@@ -1,16 +1,16 @@
-name: Daily Weather Email
+name: Scheduled Weather Email
 
 on:
   schedule:
-    - cron: '0 2 * * *'  # Runs every day at 7:30 AM IST (2:00 AM UTC)
-  workflow_dispatch:       # Allow manual trigger
+    - cron: '50 11 * * *'  # 5:17 PM IST = 11:47 AM UTC
+  workflow_dispatch:
 
 jobs:
   send_weather_email:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v3
 
       - name: Set up Python
@@ -25,9 +25,9 @@ jobs:
 
       - name: Run weather email script
         env:
-          WEATHERAPI_KEY: ${{ secrets.WEATHERAPI_KEY }}
           EMAIL: ${{ secrets.EMAIL }}
           EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
           RECIPIENT: ${{ secrets.RECIPIENT }}
+          WEATHERAPI_KEY: ${{ secrets.WEATHERAPI_KEY }}
         run: |
           python main.py
