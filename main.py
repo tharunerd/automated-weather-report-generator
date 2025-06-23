@@ -11,6 +11,7 @@ EMAIL = os.getenv("EMAIL")
 EMAIL_PASS = os.getenv("EMAIL_PASS")
 RECIPIENT = os.getenv("RECIPIENT")
 
+
 LOCATION = "Gurugram Candor Tech Space"
 CITY = "Gurgaon"
 COUNTRY = "IN"
@@ -151,6 +152,7 @@ def main():
 
     email_body = format_weather_email(data)
     subject = f"Weather & AQI Update for {LOCATION} on {data['date'].strftime('%d %B %Y')}"
+    print("Sending email...")
     send_email(subject, email_body, RECIPIENT)
     print("Email sent successfully!")
 

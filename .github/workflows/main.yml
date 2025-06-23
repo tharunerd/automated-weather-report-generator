@@ -2,7 +2,7 @@ name: Scheduled Weather Email
 
 on:
   schedule:
-    - cron: '30 2 * * *'  # 8:00 AM IST
+    - cron: '42 11 * * *'  # 4:08 PM IST
   workflow_dispatch:
 
 jobs:
@@ -25,9 +25,9 @@ jobs:
 
       - name: Run weather email script
         env:
-       WEATHERAPI_KEY: ${{ secrets.WEATHERAPI_KEY }}
-       EMAIL: ${{ secrets.EMAIL }}
-       EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
-       RECIPIENT: ${{ secrets.RECIPIENT }}
+          WEATHERAPI_KEY: ${{ secrets.WEATHERAPI_KEY }}
+          EMAIL: ${{ secrets.EMAIL }}
+          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+          RECIPIENT: ${{ secrets.RECIPIENT }}
 
         run: python main.py
