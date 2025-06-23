@@ -2,7 +2,7 @@ name: Scheduled Weather Email
 
 on:
   schedule:
-    - cron: '42 11 * * *'  # 4:08 PM IST
+    - cron: '50 11 * * *'  # 5:17 PM IST = 11:47 AM UTC
   workflow_dispatch:
 
 jobs:
@@ -16,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.x'
 
       - name: Install dependencies
         run: |
@@ -25,9 +25,18 @@ jobs:
 
       - name: Run weather email script
         env:
+<<<<<<< HEAD
           WEATHERAPI_KEY: ${{ secrets.WEATHERAPI_KEY }}
           EMAIL: ${{ secrets.EMAIL }}
           EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
           RECIPIENT: ${{ secrets.RECIPIENT }}
 
         run: python main.py
+=======
+          EMAIL: ${{ secrets.EMAIL }}
+          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+          RECIPIENT: ${{ secrets.RECIPIENT }}
+          WEATHERAPI_KEY: ${{ secrets.WEATHERAPI_KEY }}
+        run: |
+          python main.py
+>>>>>>> c871678846bb945d05d88a10ec29ec7eaa07d550
