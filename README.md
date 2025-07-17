@@ -73,9 +73,7 @@ Date: 23 June 2025 | Time: 08:00 AM IST
 Stay hydrated. Have a calm, productive day!
 – AutoWeatherBot
 ```
-
-![Weather Report Screenshot](C:\Users\AKULAKUM\OneDrive - Capgemini\Desktop\git projects\automated-weather-report-generator\Result_1.png)
-
+![Weather Report Screenshot](images/Result_1.png)
 ---
 
 ## 🌍 Credits
