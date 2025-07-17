@@ -74,6 +74,8 @@ Stay hydrated. Have a calm, productive day!
 – AutoWeatherBot
 ```
 
+![Weather Report Screenshot](C:\Users\AKULAKUM\OneDrive - Capgemini\Desktop\git projects\automated-weather-report-generator\Result_1.png)
+
 ---
 
 ## 🌍 Credits
