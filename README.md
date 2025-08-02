@@ -51,27 +51,37 @@ Go to `Settings > Secrets > Actions` in your GitHub repository and add the follo
 ## 📁 Project Structure
 ```text
 .
-├── main.py                      # Fetches data and sends email
+├── main.py                         # Fetches data and sends email
 ├── .github/workflows/schedule.yml  # GitHub Actions workflow
-└── .env                        # For local testing (not pushed)
+├── .env                            # For local testing (not pushed)
+└── .gitignore                      # include the .env file
 ```
 
 ---
 
 ## 📬 Sample Email
 ```
-📍 Daily Weather & Air Report – Gurugram
-Date: 23 June 2025 | Time: 08:00 AM IST
 
-🌤 Weather: Partly Cloudy
-🌡 Temp: 31°C (High: 34°C | Low: 27°C)
-🌅 Sunrise: 05:27 AM | 🌇 Sunset: 07:19 PM
+🌤️ Weather
+Condition: Mist
+Temperature: 29.1°C (≈ 84.4°F)
+Feels Like: 33.2°C
+Humidity: 89%
+Wind: 14.8 km/h
+Cloud Cover: 75%
+Visibility: 3.0 km
+Chance of Rain: 1.2 mm
+Sunrise: 05:43 AM
+Sunset: 07:14 PM
 
-💨 AQI: 92 – Moderate
-🔆 UV Index: [Not available on free tier]
-
-Stay hydrated. Have a calm, productive day!
-– AutoWeatherBot
+🌫️ Air Quality Index (AQI)
+AQI: 62 – Poor
+PM2.5: 62.0 µg/m³
+PM10: 62.0 µg/m³
+CO: 727.0 µg/m³
+NO₂: 39.0 µg/m³
+SO₂: 32.2 µg/m³
+O₃: 65.0 µg/m³
 ```
 ![Weather Report Screenshot](images/Result_1.png)
 ---
