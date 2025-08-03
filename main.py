@@ -4,6 +4,8 @@ from datetime import datetime
 import smtplib
 from email.mime.text import MIMEText
 from dotenv import load_dotenv
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 load_dotenv()
 WEATHERAPI_KEY = os.getenv("WEATHERAPI_KEY")
@@ -11,16 +13,27 @@ EMAIL = os.getenv("EMAIL")
 EMAIL_PASS = os.getenv("EMAIL_PASS")
 RECIPIENT = os.getenv("RECIPIENT")
 
-
 LOCATION = "Gurugram Candor Tech Space"
 CITY = "Gurgaon"
 COUNTRY = "IN"
 LAT = 28.4595
 LON = 77.0266
 
+def get_retry_session():
+    session = requests.Session()
+    retries = Retry(
+        total=3,
+        backoff_factor=0.3,
+        status_forcelist=[500, 502, 503, 504],
+        allowed_methods=["GET"]
+    )
+    adapter = HTTPAdapter(max_retries=retries)
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+    return session
+
 def format_weather_email(data):
     date_str = data['date'].strftime("%d %B %Y")
-
     weather = data['weather']
     aqi = data['aqi']
     uv = data['uv_index']
@@ -60,10 +73,15 @@ def format_weather_email(data):
 
 def get_weather_data():
     url = f"http://api.weatherapi.com/v1/forecast.json?key={WEATHERAPI_KEY}&q={CITY},{COUNTRY}&days=1&aqi=yes&alerts=no"
-    resp = requests.get(url)
-    resp.raise_for_status()
-    data = resp.json()
+    session = get_retry_session()
+    try:
+        resp = session.get(url, timeout=10)
+        resp.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print("Error fetching weather data:", e)
+        raise
 
+    data = resp.json()
     current = data['current']
     forecast_day = data['forecast']['forecastday'][0]['astro']
 
@@ -84,10 +102,15 @@ def get_weather_data():
 
 def get_air_quality_data():
     url = f"http://api.weatherapi.com/v1/current.json?key={WEATHERAPI_KEY}&q={CITY},{COUNTRY}&aqi=yes"
-    resp = requests.get(url)
-    resp.raise_for_status()
-    data = resp.json()
+    session = get_retry_session()
+    try:
+        resp = session.get(url, timeout=10)
+        resp.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print("Error fetching AQI data:", e)
+        raise
 
+    data = resp.json()
     air_quality = data['current']['air_quality']
 
     def aqi_category(pm25):
