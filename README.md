@@ -32,9 +32,11 @@ Perfect for:
 ### 1. Fork or Clone the Repo
 ```bash
 git clone https://github.com/tharunerd/automated-weather-report-generator.git
+```
 
 change the location co-ordinations in the main.py file according to your desired location
-```
+
+---
 
 ### 2. Add GitHub Secrets
 Go to `Settings > Secrets > Actions` in your GitHub repository and add the following secrets:
